@@ -26,7 +26,7 @@ bool FindPatientsIterator(const PATIENT *pPatient, void *pParam)
 int main(void)
 {
   WINFIX(SetConsoleOutputCP(CP_UTF8); SetConsoleCP(CP_UTF8));
-  PATIENTTABLE *pTable = CreatePatientTable(0);
+  PATIENT_TABLE *pTable = CreatePatientTable(0);
   printf("> ");
   for (char cmd[32] = { 0 };;)
   {

@@ -5,7 +5,7 @@
 
 bool OutputPatientData(const PATIENT *pPatient);
 
-bool OutputPatientTable(PATIENTTABLE *pTable);
+bool OutputPatientTable(PATIENT_TABLE *pTable);
 
 
 #endif

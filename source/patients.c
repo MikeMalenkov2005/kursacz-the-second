@@ -2,18 +2,20 @@
 
 #include <stdlib.h>
 
-typedef struct PATIENTRECORD
+typedef struct PATIENT_RECORD PATIENT_RECORD;
+
+struct PATIENT_RECORD
 {
   int nBigHash;
   PATIENT Patient;
   bool bEmpty;
-} PATIENTRECORD;
+};
 
-struct PATIENTTABLE
+struct PATIENT_TABLE
 {
   int nLoad;
   int nSize;
-  PATIENTRECORD *pRectords;
+  PATIENT_RECORD *pRectords;
 };
 
 int BigHash(const char *pRegNumber)
@@ -43,14 +45,14 @@ int SecondHash(int nTableSize, int nBigHash)
   return (((nBigHash >> 16) + (nBigHash & 0xFFFF)) * 2 + 1) % nTableSize;
 }
 
-PATIENTRECORD *FindPatientRecord(PATIENTTABLE *pTable, int nBigHash)
+PATIENT_RECORD *FindPatientRecord(PATIENT_TABLE *pTable, int nBigHash)
 {
   if (!pTable || nBigHash < 0) return NULL;
   int nIndex = FirstHash(pTable->nSize, nBigHash);
   int nStep = SecondHash(pTable->nSize, nBigHash);
   for (int i = 0; i < pTable->nSize; ++i)
   {
-    PATIENTRECORD *pRecord = pTable->pRectords + nIndex;
+    PATIENT_RECORD *pRecord = pTable->pRectords + nIndex;
     if (pRecord->bEmpty) return NULL;
     else if (pRecord->nBigHash == nBigHash) return pRecord;
     if ((nIndex += nStep) >= pTable->nSize) nIndex %= pTable->nSize;
@@ -58,14 +60,14 @@ PATIENTRECORD *FindPatientRecord(PATIENTTABLE *pTable, int nBigHash)
   return NULL;
 }
 
-PATIENTRECORD *FindFreeRecord(PATIENTTABLE *pTable, int nBigHash)
+PATIENT_RECORD *FindFreeRecord(PATIENT_TABLE *pTable, int nBigHash)
 {
   if (!pTable || nBigHash < 0) return NULL;
   int nIndex = FirstHash(pTable->nSize, nBigHash);
   int nStep = SecondHash(pTable->nSize, nBigHash);
   for (int i = 0; i < pTable->nSize; ++i)
   {
-    PATIENTRECORD *pRecord = pTable->pRectords + nIndex;
+    PATIENT_RECORD *pRecord = pTable->pRectords + nIndex;
     if (pRecord->bEmpty || pRecord->nBigHash < 0) return pRecord;
     if ((nIndex += nStep) >= pTable->nSize) nIndex %= pTable->nSize;
   }
@@ -77,7 +79,7 @@ bool IsValid(const char *pRegNumber)
   return BigHash(pRegNumber) >= 0;
 }
 
-PATIENTTABLE *CreatePatientTable(int nSize)
+PATIENT_TABLE *CreatePatientTable(int nSize)
 {
   if (nSize > 0)
   { // Round to the next power of 2 (from Big Twiddling Hacks)
@@ -90,10 +92,10 @@ PATIENTTABLE *CreatePatientTable(int nSize)
     ++nSize;
   }
   else nSize = 128;
-  PATIENTTABLE *pTable = malloc(sizeof(PATIENTTABLE));
+  PATIENT_TABLE *pTable = malloc(sizeof(PATIENT_TABLE));
   if (pTable)
   {
-    if (!(pTable->pRectords = malloc(sizeof(PATIENTRECORD) * nSize)))
+    if (!(pTable->pRectords = malloc(sizeof(PATIENT_RECORD) * nSize)))
     {
       free(pTable);
       return NULL;
@@ -105,7 +107,7 @@ PATIENTTABLE *CreatePatientTable(int nSize)
   return pTable;
 }
 
-void DestroyPatientTable(PATIENTTABLE *pTable)
+void DestroyPatientTable(PATIENT_TABLE *pTable)
 {
   if (pTable)
   {
@@ -114,7 +116,7 @@ void DestroyPatientTable(PATIENTTABLE *pTable)
   }
 }
 
-void ClearPatientTable(PATIENTTABLE *pTable)
+void ClearPatientTable(PATIENT_TABLE *pTable)
 {
   if (pTable)
   {
@@ -125,22 +127,22 @@ void ClearPatientTable(PATIENTTABLE *pTable)
   }
 }
 
-bool GetPatient(PATIENTTABLE *pTable, const char *pRegNumber, bool bRemove, PATIENT *pPatient)
+bool GetPatient(PATIENT_TABLE *pTable, const char *pRegNumber, bool bRemove, PATIENT *pPatient)
 {
   int nBigHash = BigHash(pRegNumber);
   if (nBigHash < 0) return false;
-  PATIENTRECORD *pRecord = FindPatientRecord(pTable, nBigHash);
+  PATIENT_RECORD *pRecord = FindPatientRecord(pTable, nBigHash);
   if (!pRecord) return false;
   if (pPatient) *pPatient = pRecord->Patient;
   if (bRemove) pRecord->nBigHash = -1;
   return true;
 }
 
-bool AddPatient(PATIENTTABLE *pTable, const PATIENT *pPatient)
+bool AddPatient(PATIENT_TABLE *pTable, const PATIENT *pPatient)
 {
   int nBigHash = BigHash(pPatient->szRegNumber);
   if (nBigHash < 0) return false;
-  PATIENTRECORD *pRecord = FindPatientRecord(pTable, nBigHash);
+  PATIENT_RECORD *pRecord = FindPatientRecord(pTable, nBigHash);
   if (!pRecord) pRecord = FindFreeRecord(pTable, nBigHash);
   if (!pRecord) return false;
   pRecord->nBigHash = nBigHash;
@@ -151,8 +153,8 @@ bool AddPatient(PATIENTTABLE *pTable, const PATIENT *pPatient)
     bool bFailed = true;
     int nLoad = pTable->nLoad;
     int nSize = pTable->nSize;
-    PATIENTRECORD *pRecords = pTable->pRectords;
-    if ((pTable->nSize = nSize << 1) > 0 && (pTable->pRectords = malloc(sizeof(PATIENTRECORD) * pTable->nSize)))
+    PATIENT_RECORD *pRecords = pTable->pRectords;
+    if ((pTable->nSize = nSize << 1) > 0 && (pTable->pRectords = malloc(sizeof(PATIENT_RECORD) * pTable->nSize)))
     {
       bFailed = false;
       pTable->nLoad = 0;
@@ -175,7 +177,7 @@ bool AddPatient(PATIENTTABLE *pTable, const PATIENT *pPatient)
   return true;
 }
 
-bool IteratePatientTable(PATIENTTABLE *pTable, PATIENTITERATOR fnIterator, void *pParams)
+bool IteratePatientTable(PATIENT_TABLE *pTable, PATIENT_ITERATOR fnIterator, void *pParams)
 {
   if (!pTable) return false;
   for (int i = 0; i < pTable->nSize; ++i)

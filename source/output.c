@@ -15,7 +15,7 @@ bool OutputPatientTableIterator(const PATIENT *pPatient, void *pParams)
   return !OutputPatientData(pPatient);
 }
 
-bool OutputPatientTable(PATIENTTABLE *pTable)
+bool OutputPatientTable(PATIENT_TABLE *pTable)
 {
   return pTable && !IteratePatientTable(pTable, OutputPatientTableIterator, NULL);
 }

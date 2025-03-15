@@ -1,12 +1,16 @@
 #ifndef APPOINTMENTS_H
 #define APPOINTMENTS_H
 
-typedef struct APPOINTMENT
+typedef struct APPOINTMENT APPOINTMENT;
+
+struct APPOINTMENT
 {
   int nPatient;
   char szDoctor[26];
   char szDate[11];
   char szTime[6];
-} APPOINTMENT;
+};
+
+typedef struct APPOINTMENT_LIST APPOINTMENT_LIST;
 
 #endif
