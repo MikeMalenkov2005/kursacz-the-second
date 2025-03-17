@@ -13,4 +13,10 @@ struct APPOINTMENT
 
 typedef struct APPOINTMENT_LIST APPOINTMENT_LIST;
 
+APPOINTMENT_LIST *CreateAppointmentList();
+
+void ClearAppointmentList(APPOINTMENT_LIST *pList);
+
+void DeleteAppointmentList(APPOINTMENT_LIST *pList);
+
 #endif
