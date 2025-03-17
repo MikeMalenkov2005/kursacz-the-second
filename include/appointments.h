@@ -5,7 +5,7 @@ typedef struct APPOINTMENT APPOINTMENT;
 
 struct APPOINTMENT
 {
-  int nPatient;
+  char szPatient[10];
   char szDoctor[26];
   char szDate[11];
   char szTime[6];

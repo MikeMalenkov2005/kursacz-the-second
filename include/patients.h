@@ -20,7 +20,7 @@ typedef bool (*PATIENT_ITERATOR)(const PATIENT *, void *); // returns true to st
 
 bool IsValid(const char *pRegNumber);
 
-PATIENT_TABLE *CreatePatientTable(int nSize);
+PATIENT_TABLE *CreatePatientTable(unsigned nSize);
 
 void DestroyPatientTable(PATIENT_TABLE *pTable);
 

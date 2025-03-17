@@ -14,7 +14,7 @@ struct APPOINTMENT_LIST
 {
   APPOINTMENT_NODE *pFirst;
   APPOINTMENT_NODE *pLast;
-  int nSize;
+  unsigned nSize;
 };
 
 APPOINTMENT_LIST *CreateAppointmentList()
@@ -50,9 +50,9 @@ void DeleteAppointmentList(APPOINTMENT_LIST *pList)
   }
 }
 
-APPOINTMENT_NODE *GetAppointmentListNode(APPOINTMENT_LIST *pList, int index)
+APPOINTMENT_NODE *GetAppointmentListNode(APPOINTMENT_LIST *pList, unsigned index)
 {
-  if (!pList || index < 0 || index >= pList->nSize) return NULL;
+  if (!pList || index >= pList->nSize) return NULL;
   APPOINTMENT_NODE *pNode = pList->pFirst;
   while (index-- && pNode) pNode = pNode->pNext;
   return pNode;
