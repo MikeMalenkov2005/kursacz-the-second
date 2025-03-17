@@ -50,10 +50,45 @@ void DeleteAppointmentList(APPOINTMENT_LIST *pList)
   }
 }
 
-APPOINTMENT_NODE *GetAppointmentListNode(APPOINTMENT_LIST *pList, unsigned index)
+APPOINTMENT_NODE *GetAppointmentListNode(APPOINTMENT_LIST *pList, unsigned nIndex)
 {
-  if (!pList || index >= pList->nSize) return NULL;
+  if (!pList || nIndex >= pList->nSize) return NULL;
   APPOINTMENT_NODE *pNode = pList->pFirst;
-  while (index-- && pNode) pNode = pNode->pNext;
+  while (nIndex-- && pNode) pNode = pNode->pNext;
   return pNode;
+}
+
+bool GetAppointment(APPOINTMENT_LIST *pList, unsigned nIndex, bool bRemove, APPOINTMENT *pAppointment)
+{
+  APPOINTMENT_NODE *pNode = GetAppointmentListNode(pList, nIndex);
+  if (!pNode) return false;
+  if (pAppointment) *pAppointment = pNode->Appointment;
+  if (bRemove)
+  {
+    if (pNode->pPrev) pNode->pPrev->pNext = pNode->pNext;
+    else pList->pFirst = pNode->pNext;
+    if (pNode->pNext) pNode->pNext->pPrev = pNode->pPrev;
+    else pList->pLast = pNode->pPrev;
+    pList->nSize--;
+  }
+  return true;
+}
+
+bool AddAppointment(APPOINTMENT_LIST *pList, const APPOINTMENT *pAppointment)
+{
+  if (!pList || !pAppointment) return false;
+  APPOINTMENT_NODE *pNode = malloc(sizeof(APPOINTMENT_NODE));
+  if (!pNode) return false;
+  pList->pLast->pNext = pNode;
+  pNode->pPrev = pList->pLast;
+  pList->pLast = pNode;
+  pList->nSize++;
+  return true;
+}
+
+bool SortAppointments(APPOINTMENT_LIST *pList)
+{
+  if (!pList) return false;
+  /* TODO: Implement quick sort here! */
+  return true;
 }
