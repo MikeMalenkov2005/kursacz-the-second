@@ -29,6 +29,8 @@ bool GetAppointment(APPOINTMENT_LIST *pList, unsigned nIndex, bool bRemove, APPO
 
 bool AddAppointment(APPOINTMENT_LIST *pList, const APPOINTMENT *pAppointment);
 
+bool SortAppointments(APPOINTMENT_LIST *pList, APPOINTMENT_COMPARATOR fnCompare);
+
 bool IterateAppointments(APPOINTMENT_LIST *pList, APPOINTMENT_CALLBACK fnCallback, void *pParams);
 
 #endif

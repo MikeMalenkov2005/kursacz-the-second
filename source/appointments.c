@@ -86,10 +86,51 @@ bool AddAppointment(APPOINTMENT_LIST *pList, const APPOINTMENT *pAppointment)
   return true;
 }
 
+void SwapAppointmentNodes(APPOINTMENT_NODE **ppNode1, APPOINTMENT_NODE **ppNode2)
+{
+  if (!ppNode1 || !ppNode2 || !*ppNode1 || !*ppNode2) return;
+  APPOINTMENT_NODE *pSwap;
+
+  pSwap = (*ppNode2)->pNext;
+  (*ppNode2)->pNext = (*ppNode1)->pNext;
+  (*ppNode1)->pNext = pSwap;
+
+  pSwap = (*ppNode2)->pPrev;
+  (*ppNode2)->pPrev = (*ppNode1)->pPrev;
+  (*ppNode1)->pPrev = pSwap;
+
+  pSwap = *ppNode2;
+  *ppNode2 = *ppNode1;
+  *ppNode1 = pSwap;
+}
+
+APPOINTMENT_NODE *QuickSortPartitionAppointments(APPOINTMENT_LIST *pList, APPOINTMENT_NODE *pLow, APPOINTMENT_NODE *pHigh, APPOINTMENT_COMPARATOR fnCompare)
+{
+  APPOINTMENT_NODE *pNode1 = pLow;
+  for (APPOINTMENT_NODE *pNode2 = pLow; pNode2 != pHigh; pNode2 = pNode2->pNext)
+  {
+    if (fnCompare(&pNode1->Appointment, &pHigh->Appointment) <= 0)
+    {
+      SwapAppointmentNodes(&pNode1, &pNode2);
+      pNode1 = pNode1->pNext;
+    }
+  }
+  SwapAppointmentNodes(&pNode1, &pHigh);
+  return pNode1;
+}
+
+void QuickSortAppointments(APPOINTMENT_LIST *pList, APPOINTMENT_NODE *pLow, APPOINTMENT_NODE *pHigh, APPOINTMENT_COMPARATOR fnCompare)
+{
+  if (!pList || !pList || !pHigh || pLow == pHigh || pLow->pPrev == pHigh) return;
+  APPOINTMENT_NODE *pPivot = QuickSortPartitionAppointments(pList, pLow, pHigh, fnCompare);
+  QuickSortAppointments(pList, pLow, pPivot->pPrev, fnCompare);
+  QuickSortAppointments(pList, pPivot->pNext, pHigh, fnCompare);
+}
+
 bool SortAppointments(APPOINTMENT_LIST *pList, APPOINTMENT_COMPARATOR fnCompare)
 {
   if (!pList) return false;
-  /* TODO: Implement quick sort here! */
+  QuickSortAppointments(pList, pList->pFirst, pList->pLast, fnCompare);
   return true;
 }
 
