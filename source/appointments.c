@@ -86,9 +86,19 @@ bool AddAppointment(APPOINTMENT_LIST *pList, const APPOINTMENT *pAppointment)
   return true;
 }
 
-bool SortAppointments(APPOINTMENT_LIST *pList)
+bool SortAppointments(APPOINTMENT_LIST *pList, APPOINTMENT_COMPARATOR fnCompare)
 {
   if (!pList) return false;
   /* TODO: Implement quick sort here! */
+  return true;
+}
+
+bool IterateAppointments(APPOINTMENT_LIST *pList, APPOINTMENT_CALLBACK fnCallback, void *pParams)
+{
+  if (!pList || !fnCallback) return false;
+  for (APPOINTMENT_NODE *pNode = pList->pFirst; pNode; pNode = pNode->pNext)
+  {
+    if (!fnCallback(&pNode->Appointment, pParams)) return false;
+  }
   return true;
 }

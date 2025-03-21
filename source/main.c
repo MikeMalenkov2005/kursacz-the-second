@@ -15,12 +15,12 @@ size_t FindSubString(const char *pString, const char *pSubString)
   return ~(size_t)0;
 }
 
-bool FindPatientsIterator(const PATIENT *pPatient, void *pParam)
+bool FindPatientsCallback(const PATIENT *pPatient, void *pParam)
 {
   PATIENT *pData = pParam;
-  if (!~FindSubString(pPatient->szFullName, pData->szFullName)) return false;
+  if (!~FindSubString(pPatient->szFullName, pData->szFullName)) return true;
   if (!pData->szRegNumber[0]) memcpy(pData->szRegNumber, pPatient->szRegNumber, sizeof(pData->szRegNumber));
-  return !OutputPatientData(pPatient);
+  return OutputPatientData(pPatient);
 }
 
 int main(void)
@@ -68,7 +68,7 @@ int main(void)
         PATIENT Patient = { 0 };
         if (InputValidString("part of patient's name", NULL, sizeof(Patient.szFullName), Patient.szFullName))
         {
-          IteratePatientTable(pTable, FindPatientsIterator, &Patient);
+          IteratePatientTable(pTable, FindPatientsCallback, &Patient);
           if (!Patient.szRegNumber[0]) printf("Error: record not found!\n");
         }
       }

@@ -16,7 +16,7 @@ struct PATIENT
 
 typedef struct PATIENT_TABLE PATIENT_TABLE;
 
-typedef bool (*PATIENT_ITERATOR)(const PATIENT *, void *); // returns true to stop iterating (signal that it found what it wanted)
+typedef bool (*PATIENT_CALLBACK)(const PATIENT *, void *); // returns false to stop iterating
 
 bool IsValid(const char *pRegNumber);
 
@@ -30,6 +30,6 @@ bool GetPatient(PATIENT_TABLE *pTable, const char *pRegNumber, bool bRemove, PAT
 
 bool AddPatient(PATIENT_TABLE *pTable, const PATIENT *pPatient);
 
-bool IteratePatientTable(PATIENT_TABLE *pTable, PATIENT_ITERATOR fnIterator, void *pParams);
+bool IteratePatientTable(PATIENT_TABLE *pTable, PATIENT_CALLBACK fnCallback, void *pParams);
 
 #endif

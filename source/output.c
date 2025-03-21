@@ -10,12 +10,12 @@ bool OutputPatientData(const PATIENT *pPatient)
   return true;
 }
 
-bool OutputPatientTableIterator(const PATIENT *pPatient, void *pParams)
+bool OutputPatientTableCallback(const PATIENT *pPatient, void *pParams)
 {
-  return !OutputPatientData(pPatient);
+  return OutputPatientData(pPatient);
 }
 
 bool OutputPatientTable(PATIENT_TABLE *pTable)
 {
-  return pTable && !IteratePatientTable(pTable, OutputPatientTableIterator, NULL);
+  return pTable && IteratePatientTable(pTable, OutputPatientTableCallback, NULL);
 }

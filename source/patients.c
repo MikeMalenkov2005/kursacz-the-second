@@ -179,16 +179,15 @@ bool AddPatient(PATIENT_TABLE *pTable, const PATIENT *pPatient)
   return true;
 }
 
-bool IteratePatientTable(PATIENT_TABLE *pTable, PATIENT_ITERATOR fnIterator, void *pParams)
+bool IteratePatientTable(PATIENT_TABLE *pTable, PATIENT_CALLBACK fnCallback, void *pParams)
 {
   if (!pTable) return false;
   for (unsigned i = 0; i < pTable->nSize; ++i)
   {
     if (!pTable->pRectords[i].bEmpty && pTable->pRectords[i].nBigHash != INVALID_HASH)
     {
-      PATIENT Patient = pTable->pRectords[i].Patient;
-      if (fnIterator(&Patient, pParams)) return true;
+      if (!fnCallback(&pTable->pRectords[i].Patient, pParams)) return false;
     }
   }
-  return false;
+  return true;
 }
