@@ -1,5 +1,6 @@
 #include <appointments.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 typedef struct APPOINTMENT_NODE APPOINTMENT_NODE;
 
@@ -17,12 +18,38 @@ struct APPOINTMENT_LIST
   unsigned nSize;
 };
 
+bool IsDateValid(const char *pDate)
+{
+  if (!isdigit(pDate[0]) || !isdigit(pDate[1]) || pDate[2] != '.'
+      || !isdigit(pDate[3]) || !isdigit(pDate[4]) || pDate[5] != '.'
+      || !isdigit(pDate[6]) || !isdigit(pDate[7]) || !isdigit(pDate[8]) || !isdigit(pDate[9]) || pDate[10]) return false;
+  int nDay = (pDate[0] - '0') * 10 + pDate[1] - '0';
+  int nMonth = (pDate[3] - '0') * 10 + pDate[4] - '0';
+  int nYear = (pDate[6] - '0') * 1000 + (pDate[7] - '0') * 100 + (pDate[8] - '0') * 10 + pDate[9] - '0';
+  if (nDay < 1 || nDay > 31 || nMonth < 1 || nMonth > 12) return false;
+  if (nDay > 30 && (nMonth == 4 || nMonth == 6 || nMonth == 9 || nMonth == 11)) return false;
+  if (nMonth == 2 && nDay > (nYear % 4 == 0 && (nYear % 100 != 0 || nYear % 400 == 0) ? 29 : 28)) return false;
+  return true;
+}
+
+bool IsTimeValid(const char *pTime)
+{
+  if (!isdigit(pTime[0]) || !isdigit(pTime[1]) || pTime[2] != ':'
+      || !isdigit(pTime[3]) || !isdigit(pTime[4]) || pTime[5]) return false;
+  int nHour = (pTime[0] - '0') * 10 + pTime[1] - '0';
+  int nMinute = (pTime[3] - '0') * 10 + pTime[4] - '0';
+  return nHour < 24 && nMinute < 60;
+}
+
 APPOINTMENT_LIST *CreateAppointmentList()
 {
   APPOINTMENT_LIST *pList = malloc(sizeof(APPOINTMENT_LIST));
-  pList->pFirst = NULL;
-  pList->pLast = NULL;
-  pList->nSize = 0;
+  if (pList)
+  {
+    pList->pFirst = NULL;
+    pList->pLast = NULL;
+    pList->nSize = 0;
+  }
   return pList;
 }
 
@@ -41,7 +68,7 @@ void ClearAppointmentList(APPOINTMENT_LIST *pList)
   }
 }
 
-void DeleteAppointmentList(APPOINTMENT_LIST *pList)
+void DestroyAppointmentList(APPOINTMENT_LIST *pList)
 {
   if (pList)
   {
@@ -79,49 +106,87 @@ bool AddAppointment(APPOINTMENT_LIST *pList, const APPOINTMENT *pAppointment)
   if (!pList || !pAppointment) return false;
   APPOINTMENT_NODE *pNode = malloc(sizeof(APPOINTMENT_NODE));
   if (!pNode) return false;
-  pList->pLast->pNext = pNode;
-  pNode->pPrev = pList->pLast;
-  pList->pLast = pNode;
+  pNode->Appointment = *pAppointment;
+  pNode->pNext = NULL;
+  if (pList->pFirst)
+  {
+    pList->pLast->pNext = pNode;
+    pNode->pPrev = pList->pLast;
+    pList->pLast = pNode;
+  }
+  else
+  {
+    pNode->pPrev = NULL;
+    pList->pFirst = pNode;
+    pList->pLast = pNode;
+  }
   pList->nSize++;
   return true;
 }
 
-void SwapAppointmentNodes(APPOINTMENT_NODE **ppNode1, APPOINTMENT_NODE **ppNode2)
+void SwapAppointmentNodes(APPOINTMENT_LIST *pList, APPOINTMENT_NODE **ppNode1, APPOINTMENT_NODE **ppNode2)
 {
-  if (!ppNode1 || !ppNode2 || !*ppNode1 || !*ppNode2) return;
+  if (!ppNode1 || !ppNode2 || !*ppNode1 || !*ppNode2 || ppNode1 == ppNode2 || *ppNode1 == *ppNode2) return;
   APPOINTMENT_NODE *pSwap;
 
-  pSwap = (*ppNode2)->pNext;
-  (*ppNode2)->pNext = (*ppNode1)->pNext;
-  (*ppNode1)->pNext = pSwap;
+  if (pList->pFirst == *ppNode1) pList->pFirst = *ppNode2;
+  else if (pList->pFirst == *ppNode2) pList->pFirst = *ppNode1;
+  if (pList->pLast == *ppNode1) pList->pLast = *ppNode2;
+  else if (pList->pLast == *ppNode2) pList->pLast = *ppNode1;
 
-  pSwap = (*ppNode2)->pPrev;
-  (*ppNode2)->pPrev = (*ppNode1)->pPrev;
-  (*ppNode1)->pPrev = pSwap;
+  if ((*ppNode1)->pNext == *ppNode2)
+  {
+    (*ppNode1)->pNext = (*ppNode2)->pNext;
+    (*ppNode2)->pPrev = (*ppNode1)->pPrev;
+    (*ppNode1)->pPrev = *ppNode2;
+    (*ppNode2)->pNext = *ppNode1;
+  }
+  else if ((*ppNode2)->pNext == *ppNode1)
+  {
+    (*ppNode2)->pNext = (*ppNode1)->pNext;
+    (*ppNode1)->pPrev = (*ppNode2)->pPrev;
+    (*ppNode2)->pPrev = *ppNode1;
+    (*ppNode1)->pNext = *ppNode2;
+  }
+  else
+  {
+    pSwap = (*ppNode2)->pNext;
+    (*ppNode2)->pNext = (*ppNode1)->pNext;
+    (*ppNode1)->pNext = pSwap;
+
+    pSwap = (*ppNode2)->pPrev;
+    (*ppNode2)->pPrev = (*ppNode1)->pPrev;
+    (*ppNode1)->pPrev = pSwap;
+  }
 
   pSwap = *ppNode2;
   *ppNode2 = *ppNode1;
   *ppNode1 = pSwap;
+
+  if ((*ppNode1)->pNext) (*ppNode1)->pNext->pPrev = *ppNode1;
+  if ((*ppNode1)->pPrev) (*ppNode1)->pPrev->pNext = *ppNode1;
+  if ((*ppNode2)->pNext) (*ppNode2)->pNext->pPrev = *ppNode2;
+  if ((*ppNode2)->pPrev) (*ppNode2)->pPrev->pNext = *ppNode2;
 }
 
 APPOINTMENT_NODE *QuickSortPartitionAppointments(APPOINTMENT_LIST *pList, APPOINTMENT_NODE *pLow, APPOINTMENT_NODE *pHigh, APPOINTMENT_COMPARATOR fnCompare)
 {
   APPOINTMENT_NODE *pNode1 = pLow;
-  for (APPOINTMENT_NODE *pNode2 = pLow; pNode2 != pHigh; pNode2 = pNode2->pNext)
+  for (APPOINTMENT_NODE *pNode2 = pLow; pNode2 && pNode2 != pHigh; pNode2 = pNode2->pNext)
   {
     if (fnCompare(&pNode1->Appointment, &pHigh->Appointment) <= 0)
     {
-      SwapAppointmentNodes(&pNode1, &pNode2);
+      SwapAppointmentNodes(pList, &pNode1, &pNode2);
       pNode1 = pNode1->pNext;
     }
   }
-  SwapAppointmentNodes(&pNode1, &pHigh);
+  SwapAppointmentNodes(pList, &pNode1, &pHigh);
   return pNode1;
 }
 
 void QuickSortAppointments(APPOINTMENT_LIST *pList, APPOINTMENT_NODE *pLow, APPOINTMENT_NODE *pHigh, APPOINTMENT_COMPARATOR fnCompare)
 {
-  if (!pList || !pList || !pHigh || pLow == pHigh || pLow->pPrev == pHigh) return;
+  if (!pLow || !pHigh || pLow == pHigh || pLow->pPrev == pHigh) return;
   APPOINTMENT_NODE *pPivot = QuickSortPartitionAppointments(pList, pLow, pHigh, fnCompare);
   QuickSortAppointments(pList, pLow, pPivot->pPrev, fnCompare);
   QuickSortAppointments(pList, pPivot->pNext, pHigh, fnCompare);

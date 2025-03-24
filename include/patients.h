@@ -18,7 +18,7 @@ typedef struct PATIENT_TABLE PATIENT_TABLE;
 
 typedef bool (*PATIENT_CALLBACK)(const PATIENT *, void *); // returns false to stop iterating
 
-bool IsValid(const char *pRegNumber);
+bool IsRegNumberValid(const char *pRegNumber);
 
 PATIENT_TABLE *CreatePatientTable(unsigned nSize);
 

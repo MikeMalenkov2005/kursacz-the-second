@@ -19,11 +19,15 @@ typedef bool (*APPOINTMENT_CALLBACK)(const APPOINTMENT *, void *); // returns fa
 
 typedef int (*APPOINTMENT_COMPARATOR)(const APPOINTMENT *, const APPOINTMENT *);
 
+bool IsDateValid(const char *pDate);
+
+bool IsTimeValid(const char *pTime);
+
 APPOINTMENT_LIST *CreateAppointmentList();
 
 void ClearAppointmentList(APPOINTMENT_LIST *pList);
 
-void DeleteAppointmentList(APPOINTMENT_LIST *pList);
+void DestroyAppointmentList(APPOINTMENT_LIST *pList);
 
 bool GetAppointment(APPOINTMENT_LIST *pList, unsigned nIndex, bool bRemove, APPOINTMENT *pAppointment);
 

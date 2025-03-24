@@ -75,7 +75,7 @@ PATIENT_RECORD *FindFreeRecord(PATIENT_TABLE *pTable, unsigned nBigHash)
   return NULL;
 }
 
-bool IsValid(const char *pRegNumber)
+bool IsRegNumberValid(const char *pRegNumber)
 {
   return BigHash(pRegNumber) != INVALID_HASH;
 }

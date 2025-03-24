@@ -7,7 +7,7 @@ THE PLAN
 --------
 
 1. [x] Implement a hash table.
-2. [ ] Implement a list.
+2. [x] Implement a list.
 3. [ ] Implement an AVL tree.
 4. [ ] Implement saving and loading.
 
