@@ -1,7 +1,7 @@
 KURSACZ THE SECOND
 ==================
 
-This repository was created for working on my second year university assignment.
+This repository was created for working on my fourth semester university assignment.
 
 THE PLAN
 --------
