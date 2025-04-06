@@ -87,6 +87,15 @@ bool InputPatientData(PATIENT *pPatient)
     && InputValidString("work place", NULL, sizeof(pPatient->szWorkPlace), pPatient->szWorkPlace);
 }
 
+bool InputDoctorData(DOCTOR *pDoctor)
+{
+  return pDoctor
+    && InputValidString("full name", NULL, sizeof(pDoctor->szFullName), pDoctor->szFullName)
+    && InputValidString("job title", NULL, sizeof(pDoctor->szJobTitle), pDoctor->szJobTitle)
+    && InputValidUnsignedInteger("office number", NULL, sizeof(pDoctor->nOfficeNumber), &pDoctor->nOfficeNumber)
+    && InputValidString("appointment schedule", IsValidSchedule, sizeof(pDoctor->szSchedule), pDoctor->szSchedule);
+}
+
 bool InputAppointmentData(APPOINTMENT *pAppointment)
 {
   return pAppointment

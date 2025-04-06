@@ -20,6 +20,24 @@ bool OutputPatientTable(PATIENT_TABLE *pTable)
   return pTable && IteratePatientTable(pTable, OutputPatientTableCallback, NULL);
 }
 
+bool OutputDoctorData(const DOCTOR *pDoctor)
+{
+  if (!pDoctor) return false;
+  printf("%s:\n  - Job title: %s\n  - Office number: %u\n  - Appointment schedule: %s",
+    pDoctor->szFullName, pDoctor->szJobTitle, pDoctor->nOfficeNumber, pDoctor->szSchedule);
+  return true;
+}
+
+bool OutputDoctorTreeCallback(const DOCTOR *pDoctor, void *pParams)
+{
+  return OutputDoctorData(pDoctor);
+}
+
+bool OutputDoctorTree(DOCTOR_TREE *pTree)
+{
+  return pTree && IterateDoctorTree(pTree, OutputDoctorTreeCallback, NULL);
+}
+
 bool OutputAppointmentData(const APPOINTMENT *pAppointment)
 {
   if (!pAppointment) return false;

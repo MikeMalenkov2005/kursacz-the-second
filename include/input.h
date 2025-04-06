@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include <patients.h>
+#include <doctors.h>
 #include <appointments.h>
 
 typedef bool (*INTEGER_VALIDATOR)(int);
@@ -21,6 +22,8 @@ bool InputValidUnsignedInteger(const char *pTitle, UNSIGNED_INTEGER_VALIDATOR fn
 bool InputValidString(const char *pTitle, STRING_VALIDATOR fnIsValid, size_t cbMaxLength, char *pString);
 
 bool InputPatientData(PATIENT *pPatient);
+
+bool InputDoctorData(DOCTOR *pDoctor);
 
 bool InputAppointmentData(APPOINTMENT *pAppointment);
 
