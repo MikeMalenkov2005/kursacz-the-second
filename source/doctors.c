@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define IsDigit(c)  (c >= '0' && c <= '9')
+
 typedef struct DOCTOR_NODE DOCTOR_NODE;
 
 struct DOCTOR_NODE
@@ -19,10 +21,10 @@ struct DOCTOR_TREE
 
 bool IsValidSchedule(const char *pSchedule)
 {
-  if (!isdigit(pSchedule[0]) || !isdigit(pSchedule[1]) || pSchedule[2] != ':'
-      || !isdigit(pSchedule[3]) || !isdigit(pSchedule[4]) || pSchedule[5] != '-'
-      || !isdigit(pSchedule[6]) || !isdigit(pSchedule[7]) || pSchedule[8] != ':'
-      || !isdigit(pSchedule[9]) || !isdigit(pSchedule[10]) || pSchedule[11]) return false;
+  if (!IsDigit(pSchedule[0]) || !IsDigit(pSchedule[1]) || pSchedule[2] != ':'
+      || !IsDigit(pSchedule[3]) || !IsDigit(pSchedule[4]) || pSchedule[5] != '-'
+      || !IsDigit(pSchedule[6]) || !IsDigit(pSchedule[7]) || pSchedule[8] != ':'
+      || !IsDigit(pSchedule[9]) || !IsDigit(pSchedule[10]) || pSchedule[11]) return false;
   int nBeginHour = (pSchedule[0] - '0') * 10 + pSchedule[1] - '0';
   int nBeginMinute = (pSchedule[3] - '0') * 10 + pSchedule[4] - '0';
   int nEndHour = (pSchedule[6] - '0') * 10 + pSchedule[7] - '0';
@@ -154,22 +156,22 @@ DOCTOR_NODE *RemoveLeftMostNode(DOCTOR_NODE *pRoot)
   return BalanceNode(pRoot);
 }
 
-DOCTOR_NODE *FindDoctor(DOCTOR_NODE *pRoot, bool bRemove, DOCTOR *pDoctor, bool *pbFound)
+DOCTOR_NODE *FindDoctor(DOCTOR_NODE *pRoot, const char *pFullName, bool bRemove, DOCTOR *pDoctor, bool *pbFound)
 {
   if (!pRoot) return pRoot;
-  int nDifference = strncmp(pDoctor->szFullName, pRoot->Doctor.szFullName, sizeof(pDoctor->szFullName));
+  int nDifference = strncmp(pFullName, pFullName, sizeof(pRoot->Doctor.szFullName));
   if (nDifference < 0)
   {
-    pRoot->pLeft = FindDoctor(pRoot->pLeft, bRemove, pDoctor, pbFound);
+    pRoot->pLeft = FindDoctor(pRoot->pLeft, pFullName, bRemove, pDoctor, pbFound);
   }
   else if (nDifference > 0)
   {
-    pRoot->pRight = FindDoctor(pRoot->pRight, bRemove, pDoctor, pbFound);
+    pRoot->pRight = FindDoctor(pRoot->pRight, pFullName, bRemove, pDoctor, pbFound);
   }
   else
   {
     *pbFound = true;
-    *pDoctor = pRoot->Doctor;
+    if (pDoctor) *pDoctor = pRoot->Doctor;
     if (bRemove)
     {
       DOCTOR_NODE *pLeft = pRoot->pLeft;
@@ -184,11 +186,11 @@ DOCTOR_NODE *FindDoctor(DOCTOR_NODE *pRoot, bool bRemove, DOCTOR *pDoctor, bool 
   return BalanceNode(pRoot);
 }
 
-bool GetDoctor(DOCTOR_TREE *pTree, bool bRemove, DOCTOR *pDoctor)
+bool GetDoctor(DOCTOR_TREE *pTree, const char *pFullName, bool bRemove, DOCTOR *pDoctor)
 {
   if (!pTree || !pDoctor) return false;
   bool bFound = false;
-  pTree->pRoot = FindDoctor(pTree->pRoot, bRemove, pDoctor, &bFound);
+  pTree->pRoot = FindDoctor(pTree->pRoot, pFullName, bRemove, pDoctor, &bFound);
   return bFound;
 }
 

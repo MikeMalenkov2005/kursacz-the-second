@@ -17,4 +17,8 @@ bool OutputAppointmentData(const APPOINTMENT *pAppointment);
 
 bool OutputAppointmentList(APPOINTMENT_LIST *pList);
 
+bool OutputPatientAppointments(APPOINTMENT_LIST *pList, const char *pPatientRegNumber);
+
+bool OutputDoctorAppointments(APPOINTMENT_LIST *pList, const char *pDoctorFullName);
+
 #endif

@@ -1,6 +1,7 @@
 #include <appointments.h>
 #include <stdlib.h>
-#include <ctype.h>
+
+#define IsDigit(c)  (c >= '0' && c <= '9')
 
 typedef struct APPOINTMENT_NODE APPOINTMENT_NODE;
 
@@ -20,9 +21,9 @@ struct APPOINTMENT_LIST
 
 bool IsDateValid(const char *pDate)
 {
-  if (!isdigit(pDate[0]) || !isdigit(pDate[1]) || pDate[2] != '.'
-      || !isdigit(pDate[3]) || !isdigit(pDate[4]) || pDate[5] != '.'
-      || !isdigit(pDate[6]) || !isdigit(pDate[7]) || !isdigit(pDate[8]) || !isdigit(pDate[9]) || pDate[10]) return false;
+  if (!IsDigit(pDate[0]) || !IsDigit(pDate[1]) || pDate[2] != '.'
+      || !IsDigit(pDate[3]) || !IsDigit(pDate[4]) || pDate[5] != '.'
+      || !IsDigit(pDate[6]) || !IsDigit(pDate[7]) || !IsDigit(pDate[8]) || !IsDigit(pDate[9]) || pDate[10]) return false;
   int nDay = (pDate[0] - '0') * 10 + pDate[1] - '0';
   int nMonth = (pDate[3] - '0') * 10 + pDate[4] - '0';
   int nYear = (pDate[6] - '0') * 1000 + (pDate[7] - '0') * 100 + (pDate[8] - '0') * 10 + pDate[9] - '0';
@@ -34,8 +35,8 @@ bool IsDateValid(const char *pDate)
 
 bool IsTimeValid(const char *pTime)
 {
-  if (!isdigit(pTime[0]) || !isdigit(pTime[1]) || pTime[2] != ':'
-      || !isdigit(pTime[3]) || !isdigit(pTime[4]) || pTime[5]) return false;
+  if (!IsDigit(pTime[0]) || !IsDigit(pTime[1]) || pTime[2] != ':'
+      || !IsDigit(pTime[3]) || !IsDigit(pTime[4]) || pTime[5]) return false;
   int nHour = (pTime[0] - '0') * 10 + pTime[1] - '0';
   int nMinute = (pTime[3] - '0') * 10 + pTime[4] - '0';
   return nHour < 24 && nMinute < 60;

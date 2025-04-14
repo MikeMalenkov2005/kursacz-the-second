@@ -1,19 +1,9 @@
 #include <winfix.h>
 #include <input.h>
 #include <output.h>
+#include <utils.h>
 
 #include <stdio.h>
-
-size_t FindSubString(const char *pString, const char *pSubString)
-{
-  size_t nStringLength = strlen(pString);
-  size_t nSubStringLength = strlen(pSubString);
-  for (size_t i = 0; i + nSubStringLength < nStringLength; ++i)
-  {
-    if (!strncmp(pString + i, pSubString, nSubStringLength)) return i;
-  }
-  return ~(size_t)0;
-}
 
 bool FindPatientsCallback(const PATIENT *pPatient, void *pParam)
 {
@@ -23,29 +13,19 @@ bool FindPatientsCallback(const PATIENT *pPatient, void *pParam)
   return OutputPatientData(pPatient);
 }
 
-bool IsOneBasedIndexValid(unsigned nIndex)
+bool FindDoctorsCallback(const DOCTOR *pDoctor, void *pParam)
 {
-  return nIndex;
-}
-
-int AppointmentByDoctorComparator(const APPOINTMENT *pLeft, const APPOINTMENT *pRight)
-{
-  return strncmp(pLeft->szDoctor, pRight->szDoctor, sizeof(pLeft->szDoctor));
-}
-
-bool CheckIfAppointmentCanBeMadeCallback(const APPOINTMENT *pListEntry, void *pParams)
-{
-  const APPOINTMENT *pAppointment = pParams;
-  return (strncmp(pListEntry->szDoctor, pAppointment->szDoctor, sizeof(pAppointment->szDoctor))
-      && strncmp(pListEntry->szPatient, pAppointment->szPatient, sizeof(pAppointment->szPatient)))
-      || strncmp(pListEntry->szDate, pAppointment->szDate, sizeof(pAppointment->szDate))
-      || strncmp(pListEntry->szTime, pAppointment->szTime, sizeof(pAppointment->szTime));
+  DOCTOR *pData = pParam;
+  if (!~FindSubString(pDoctor->szJobTitle, pData->szJobTitle)) return true;
+  if (!pData->szFullName[0]) memcpy(pData->szFullName, pDoctor->szFullName, sizeof(pData->szFullName));
+  return OutputDoctorData(pDoctor);
 }
 
 int main(void)
 {
-  WINFIX(SetConsoleOutputCP(CP_UTF8); SetConsoleCP(CP_UTF8));
+  WINFIX(SetConsoleOutputCP(1251); SetConsoleCP(1251));
   PATIENT_TABLE *pTable = CreatePatientTable(0);
+  DOCTOR_TREE *pTree = CreateDoctorTree();
   APPOINTMENT_LIST *pList = CreateAppointmentList();
   printf("> ");
   for (char cmd[32] = { 0 };;)
@@ -64,6 +44,11 @@ int main(void)
         printf("  - find patient\n");
         printf("  - remove patient\n");
         printf("  - list patients\n");
+        printf("  - add doctor\n");
+        printf("  - get doctor\n");
+        printf("  - find doctor\n");
+        printf("  - remove doctor\n");
+        printf("  - list doctors\n");
         printf("  - add appointment\n");
         printf("  - get appointment\n");
         printf("  - remove appointment\n");
@@ -84,7 +69,12 @@ int main(void)
         PATIENT Patient = { 0 };
         if (InputValidString("registration number", IsRegNumberValid, sizeof(Patient.szRegNumber), Patient.szRegNumber))
         {
-          if (GetPatient(pTable, Patient.szRegNumber, false, &Patient)) OutputPatientData(&Patient);
+          if (GetPatient(pTable, Patient.szRegNumber, false, &Patient))
+          {
+            OutputPatientData(&Patient);
+            printf("\nAppointments:\n");
+            OutputPatientAppointments(pList, Patient.szRegNumber);
+          }
           else printf("Error: record not found!\n");
         }
       }
@@ -99,20 +89,71 @@ int main(void)
       }
       else if (!strcmp(cmd, "remove patient"))
       {
-        char szRegNumber[10];
-        if (InputValidString("registration number", IsRegNumberValid, sizeof(szRegNumber), szRegNumber))
+        PATIENT Patient = { 0 };
+        if (InputValidString("registration number", IsRegNumberValid, sizeof(Patient.szRegNumber), Patient.szRegNumber))
         {
-          if (GetPatient(pTable, szRegNumber, true, NULL)) printf("Success!\n");
+
+          if (GetPatient(pTable, Patient.szRegNumber, true, &Patient))
+          {
+            if (RemoveAppointmentsByPatient(pList, Patient.szRegNumber)) printf("Success!\n");
+            else printf("Warning: could not remove all appointments!\nSuccess!\n");
+          }
           else printf("Error: record not found!\n");
         }
       }
       else if (!strcmp(cmd, "list patients")) OutputPatientTable(pTable);
+      else if (!strcmp(cmd, "add doctor"))
+      {
+        DOCTOR Doctor = { 0 };
+        if (InputDoctorData(&Doctor))
+        {
+          if (AddDoctor(pTree, &Doctor)) printf("Success!\n");
+          else printf("Error: the tree is full!\n");
+        }
+      }
+      else if (!strcmp(cmd, "get doctor"))
+      {
+        DOCTOR Doctor = { 0 };
+        if (InputValidString("doctor's full name", NULL, sizeof(Doctor.szFullName), Doctor.szFullName))
+        {
+          if (GetDoctor(pTree, Doctor.szFullName, false, &Doctor))
+          {
+            OutputDoctorData(&Doctor);
+            printf("\nAppointments:\n");
+            OutputDoctorAppointments(pList, Doctor.szFullName);
+          }
+          else printf("Error: record not found!\n");
+        }
+      }
+      else if (!strcmp(cmd, "find doctor"))
+      {
+        DOCTOR Doctor = { 0 };
+        if (InputValidString("part of doctor's job title", NULL, sizeof(Doctor.szJobTitle), Doctor.szJobTitle))
+        {
+          IterateDoctorTree(pTree, FindDoctorsCallback, &Doctor);
+          if (!Doctor.szFullName[0]) printf("Error: record not found!\n");
+        }
+      }
+      else if (!strcmp(cmd, "remove doctor"))
+      {
+        DOCTOR Doctor;
+        if (InputValidString("registration number", NULL, sizeof(Doctor.szFullName), Doctor.szFullName))
+        {
+          if (GetDoctor(pTree, Doctor.szFullName, true, &Doctor))
+          {
+            if (RemoveAppointmentsByDoctor(pList, Doctor.szFullName)) printf("Success!\n");
+            else printf("Warning: could not remove all appointments!\nSuccess!\n");
+          }
+          else printf("Error: record not found!\n");
+        }
+      }
+      else if (!strcmp(cmd, "list doctors")) OutputDoctorTree(pTree);
       else if (!strcmp(cmd, "add appointment"))
       {
         APPOINTMENT Appointment = { 0 };
         if (InputAppointmentData(&Appointment))
         {
-          if (IterateAppointments(pList, CheckIfAppointmentCanBeMadeCallback, &Appointment))
+          if (CheckIfAppointmentCanBeMade(pTable, pTree, pList, &Appointment))
           {
             if (AddAppointment(pList, &Appointment)) printf("Success!\n");
             else printf("Error: the list is full!\n");
@@ -151,6 +192,7 @@ int main(void)
     printf("> ");
   }
   DestroyAppointmentList(pList);
+  DestroyDoctorTree(pTree);
   DestroyPatientTable(pTable);
   printf("Bye!\n");
   return 0;

@@ -25,7 +25,7 @@ void ClearDoctorTree(DOCTOR_TREE *pTree);
 
 void DestroyDoctorTree(DOCTOR_TREE *pTree);
 
-bool GetDoctor(DOCTOR_TREE *pTree, bool bRemove, DOCTOR *pDoctor);
+bool GetDoctor(DOCTOR_TREE *pTree, const char *pFullName, bool bRemove, DOCTOR *pDoctor);
 
 bool AddDoctor(DOCTOR_TREE *pTree, const DOCTOR *pDoctor);
 
