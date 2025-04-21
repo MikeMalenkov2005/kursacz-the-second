@@ -9,18 +9,18 @@ typedef struct STORAGE_HELPER
   unsigned nIndex;
 } STORAGE_HELPER;
 
-unsigned ComputeCheckSum(unsigned nSeed, const void *pData, size_t nDataBytes)
+unsigned ComputeCheckSum(unsigned nSeed, const void *pData, size_t cbDataSize)
 {
-  for (size_t i = 0; i < nDataBytes; ++i)
+  for (size_t i = 0; i < cbDataSize; ++i)
   {
     nSeed += (unsigned)((const unsigned char*)pData)[i];
   }
   return -nSeed;
 }
 
-bool VerifyCheckSum(unsigned nSeed, const void *pData, size_t nDataBytes, unsigned nCheckSum)
+bool VerifyCheckSum(unsigned nSeed, const void *pData, size_t cbDataSize, unsigned nCheckSum)
 {
-  for (size_t i = 0; i < nDataBytes; ++i)
+  for (size_t i = 0; i < cbDataSize; ++i)
   {
     nSeed += (unsigned)((const unsigned char*)pData)[i];
   }
@@ -107,6 +107,7 @@ bool LoadMedicalData(const char *pFileName, PATIENT_TABLE *pTable, DOCTOR_TREE *
     fread(&Patient, sizeof(Patient), 1, Helper.pFile);
     fread(&nCheckSum, sizeof(nCheckSum), 1, Helper.pFile);
     if (!VerifyCheckSum(Helper.nIndex, &Patient, sizeof(Patient), nCheckSum)) return fclose(Helper.pFile), false;
+    if (!AddPatient(pTable, &Patient)) return fclose(Helper.pFile), false;
   }
 
   fread(aHeader, 1, 4, Helper.pFile);
@@ -119,6 +120,7 @@ bool LoadMedicalData(const char *pFileName, PATIENT_TABLE *pTable, DOCTOR_TREE *
     fread(&Doctor, sizeof(Doctor), 1, Helper.pFile);
     fread(&nCheckSum, sizeof(nCheckSum), 1, Helper.pFile);
     if (!VerifyCheckSum(Helper.nIndex, &Doctor, sizeof(Doctor), nCheckSum)) return fclose(Helper.pFile), false;
+    if (!AddDoctor(pTree, &Doctor)) return fclose(Helper.pFile), false;
   }
 
   fread(aHeader, 1, 4, Helper.pFile);
@@ -131,6 +133,7 @@ bool LoadMedicalData(const char *pFileName, PATIENT_TABLE *pTable, DOCTOR_TREE *
     fread(&Appointment, sizeof(Appointment), 1, Helper.pFile);
     fread(&nCheckSum, sizeof(nCheckSum), 1, Helper.pFile);
     if (!VerifyCheckSum(Helper.nIndex, &Appointment, sizeof(Appointment), nCheckSum)) return fclose(Helper.pFile), false;
+    if (!AddAppointment(pList, &Appointment)) return fclose(Helper.pFile), false;
   }
 
   fclose(Helper.pFile);

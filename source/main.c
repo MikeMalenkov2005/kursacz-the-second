@@ -2,6 +2,7 @@
 #include <input.h>
 #include <output.h>
 #include <utils.h>
+#include <storage.h>
 
 #include <stdio.h>
 
@@ -27,7 +28,7 @@ int main(void)
   PATIENT_TABLE *pTable = CreatePatientTable(0);
   DOCTOR_TREE *pTree = CreateDoctorTree();
   APPOINTMENT_LIST *pList = CreateAppointmentList();
-  printf("> ");
+  printf("\n> ");
   for (char cmd[32] = { 0 };;)
   {
     if (InputString(sizeof(cmd), cmd) || !ClearInput())
@@ -54,6 +55,8 @@ int main(void)
         printf("  - remove appointment\n");
         printf("  - list appointments\n");
         printf("  - sort appointments\n");
+        printf("  - save\n");
+        printf("  - load\n");
       }
       else if (!strcmp(cmd, "add patient"))
       {
@@ -188,10 +191,28 @@ int main(void)
         SortAppointments(pList, AppointmentByDoctorComparator);
         OutputAppointmentList(pList);
       }
+      else if (!strcmp(cmd, "save"))
+      {
+        char szFileName[256];
+        if (InputValidString("a file name", NULL, sizeof(szFileName), szFileName))
+        {
+          if (SaveMedicalData(szFileName, pTable, pTree, pList)) printf("Success!");
+          else printf("Error: failed to open the file!");
+        }
+      }
+      else if (!strcmp(cmd, "load"))
+      {
+        char szFileName[256];
+        if (InputValidString("a file name", NULL, sizeof(szFileName), szFileName))
+        {
+          if (LoadMedicalData(szFileName, pTable, pTree, pList)) printf("Success!\n");
+          else printf("Error: the file is currupted!\n");
+        }
+      }
       else printf("Error: unknown command!\n");
     }
     else printf("Error: command has spaces or is too long!\n");
-    printf("> ");
+    printf("\n> ");
   }
   DestroyAppointmentList(pList);
   DestroyDoctorTree(pTree);
