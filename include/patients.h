@@ -26,6 +26,8 @@ void DestroyPatientTable(PATIENT_TABLE *pTable);
 
 void ClearPatientTable(PATIENT_TABLE *pTable);
 
+unsigned GetPatientCount(PATIENT_TABLE *pTable);
+
 bool GetPatient(PATIENT_TABLE *pTable, const char *pRegNumber, bool bRemove, PATIENT *pPatient);
 
 bool AddPatient(PATIENT_TABLE *pTable, const PATIENT *pPatient);

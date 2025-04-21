@@ -60,7 +60,8 @@ int main(void)
         PATIENT Patient = { 0 };
         if (InputPatientData(&Patient))
         {
-          if (AddPatient(pTable, &Patient)) printf("Success!\n");
+          if (GetPatient(pTable, Patient.szRegNumber, false, NULL)) printf("Error: patient with this registration number already exists!\n");
+          else if (AddPatient(pTable, &Patient)) printf("Success!\n");
           else printf("Error: the table is full!\n");
         }
       }
@@ -107,7 +108,8 @@ int main(void)
         DOCTOR Doctor = { 0 };
         if (InputDoctorData(&Doctor))
         {
-          if (AddDoctor(pTree, &Doctor)) printf("Success!\n");
+          if (GetDoctor(pTree, Doctor.szFullName, false, NULL)) printf("Error: doctor with this full name already exists!\n");
+          else if (AddDoctor(pTree, &Doctor)) printf("Success!\n");
           else printf("Error: the tree is full!\n");
         }
       }

@@ -128,6 +128,11 @@ void ClearPatientTable(PATIENT_TABLE *pTable)
   }
 }
 
+unsigned GetPatientCount(PATIENT_TABLE *pTable)
+{
+  return pTable->nLoad;
+}
+
 bool GetPatient(PATIENT_TABLE *pTable, const char *pRegNumber, bool bRemove, PATIENT *pPatient)
 {
   unsigned nBigHash = BigHash(pRegNumber);

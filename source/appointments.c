@@ -54,6 +54,15 @@ APPOINTMENT_LIST *CreateAppointmentList()
   return pList;
 }
 
+void DestroyAppointmentList(APPOINTMENT_LIST *pList)
+{
+  if (pList)
+  {
+    ClearAppointmentList(pList);
+    free(pList);
+  }
+}
+
 void ClearAppointmentList(APPOINTMENT_LIST *pList)
 {
   if (pList && pList->pFirst)
@@ -69,13 +78,9 @@ void ClearAppointmentList(APPOINTMENT_LIST *pList)
   }
 }
 
-void DestroyAppointmentList(APPOINTMENT_LIST *pList)
+unsigned GetAppointmentCount(APPOINTMENT_LIST *pList)
 {
-  if (pList)
-  {
-    ClearAppointmentList(pList);
-    free(pList);
-  }
+  return pList->nSize;
 }
 
 APPOINTMENT_NODE *GetAppointmentListNode(APPOINTMENT_LIST *pList, unsigned nIndex)

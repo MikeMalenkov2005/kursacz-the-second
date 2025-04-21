@@ -25,9 +25,11 @@ bool IsTimeValid(const char *pTime);
 
 APPOINTMENT_LIST *CreateAppointmentList();
 
+void DestroyAppointmentList(APPOINTMENT_LIST *pList);
+
 void ClearAppointmentList(APPOINTMENT_LIST *pList);
 
-void DestroyAppointmentList(APPOINTMENT_LIST *pList);
+unsigned GetAppointmentCount(APPOINTMENT_LIST *pList);
 
 bool GetAppointment(APPOINTMENT_LIST *pList, unsigned nIndex, bool bRemove, APPOINTMENT *pAppointment);
 

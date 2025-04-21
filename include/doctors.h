@@ -21,9 +21,11 @@ bool IsValidSchedule(const char *pSchedule);
 
 DOCTOR_TREE *CreateDoctorTree();
 
+void DestroyDoctorTree(DOCTOR_TREE *pTree);
+
 void ClearDoctorTree(DOCTOR_TREE *pTree);
 
-void DestroyDoctorTree(DOCTOR_TREE *pTree);
+unsigned GetDoctorCount(DOCTOR_TREE *pTree);
 
 bool GetDoctor(DOCTOR_TREE *pTree, const char *pFullName, bool bRemove, DOCTOR *pDoctor);
 

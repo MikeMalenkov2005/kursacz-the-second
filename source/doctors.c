@@ -130,11 +130,6 @@ DOCTOR_NODE *BalanceNode(DOCTOR_NODE *pNode)
   else return pNode;
 }
 
-void ClearDoctorTree(DOCTOR_TREE *pTree)
-{
-  if (pTree) DestroyDoctorNodes(pTree->pRoot);
-}
-
 void DestroyDoctorTree(DOCTOR_TREE *pTree)
 {
   if (pTree)
@@ -142,6 +137,27 @@ void DestroyDoctorTree(DOCTOR_TREE *pTree)
     DestroyDoctorNodes(pTree->pRoot);
     free(pTree);
   }
+}
+
+void ClearDoctorTree(DOCTOR_TREE *pTree)
+{
+  if (pTree)
+  {
+    DestroyDoctorNodes(pTree->pRoot);
+    pTree->pRoot = NULL;
+  }
+}
+
+bool GetDoctorCountCallback(const DOCTOR *pDoctor, void *pParams)
+{
+  return !++*(unsigned*)pParams;
+}
+
+unsigned GetDoctorCount(DOCTOR_TREE *pTree)
+{
+  unsigned nResult = 0;
+  IterateDoctorTree(pTree, GetDoctorCountCallback, &nResult);
+  return nResult;
 }
 
 DOCTOR_NODE *FindLeftMostNode(DOCTOR_NODE *pRoot)
