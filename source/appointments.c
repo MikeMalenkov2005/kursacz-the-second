@@ -180,7 +180,7 @@ APPOINTMENT_NODE *QuickSortPartitionAppointments(APPOINTMENT_LIST *pList, APPOIN
   APPOINTMENT_NODE *pNode1 = pLow;
   for (APPOINTMENT_NODE *pNode2 = pLow; pNode2 && pNode2 != pHigh; pNode2 = pNode2->pNext)
   {
-    if (fnCompare(&pNode1->Appointment, &pHigh->Appointment) <= 0)
+    if (fnCompare(&pNode2->Appointment, &pHigh->Appointment) <= 0)
     {
       SwapAppointmentNodes(pList, &pNode1, &pNode2);
       pNode1 = pNode1->pNext;
