@@ -58,32 +58,47 @@ bool OutputAppointmentList(APPOINTMENT_LIST *pList)
   return pList && IterateAppointments(pList, OutputAppointmentListCallback, &nIndex);
 }
 
-typedef struct STRING_UINT
+typedef struct APPOINTMENT_INFO
 {
-  const char *pString;
-  unsigned int nInt;
-} STRING_UINT;
+  const char *pPrimaryKey;
+  unsigned int nIndex;
+  void *pCollection;
+} APPOINTMENT_INFO;
 
 bool OutputPatientAppointmentsCallback(const APPOINTMENT *pAppointment, void *pParams)
 {
-  STRING_UINT *pInfo = pParams;
-  return strncmp(pInfo->pString, pAppointment->szPatient, sizeof(pAppointment->szPatient)) || (printf("%u:\n", ++pInfo->nInt), OutputAppointmentData(pAppointment));
+  APPOINTMENT_INFO *pInfo = pParams;
+  if (!strncmp(pInfo->pPrimaryKey, pAppointment->szPatient, sizeof(pAppointment->szPatient)))
+  {
+    printf("%u:\n  - Doctor: %s\n  - Date: %s\n  - Time: %s\n", ++pInfo->nIndex, pAppointment->szDoctor, pAppointment->szDate, pAppointment->szTime);
+  }
+  return true;
 }
 
 bool OutputPatientAppointments(APPOINTMENT_LIST *pList, const char *pPatientRegNumber)
 {
-  STRING_UINT Info = { pPatientRegNumber };
+  APPOINTMENT_INFO Info = { pPatientRegNumber };
+  if (!pList || !pPatientRegNumber) return false;
+  printf("\nAppointments:\n");
   return IterateAppointments(pList, OutputPatientAppointmentsCallback, &Info);
 }
 
 bool OutputDoctorAppointmentsCallback(const APPOINTMENT *pAppointment, void *pParams)
 {
-  STRING_UINT *pInfo = pParams;
-  return strncmp(pInfo->pString, pAppointment->szDoctor, sizeof(pAppointment->szDoctor)) || (printf("%u:\n", ++pInfo->nInt), OutputAppointmentData(pAppointment));
+  PATIENT Patient;
+  APPOINTMENT_INFO *pInfo = pParams;
+  if (!strncmp(pInfo->pPrimaryKey, pAppointment->szDoctor, sizeof(pAppointment->szDoctor)) && GetPatient(pInfo->pCollection, pAppointment->szPatient, false, &Patient))
+  {
+    printf("%s:\n  - Full name: %s\n  - Date: %s\n  - Time: %s\n", Patient.szRegNumber, Patient.szFullName, pAppointment->szDate, pAppointment->szTime);
+  }
+  return true;
 }
 
-bool OutputDoctorAppointments(APPOINTMENT_LIST *pList, const char *pDoctorFullName)
+bool OutputDoctorAppointments(PATIENT_TABLE *pTable, APPOINTMENT_LIST *pList, const char *pDoctorFullName)
 {
-  STRING_UINT Info = { pDoctorFullName };
+  APPOINTMENT_INFO Info = { pDoctorFullName };
+  if (!pTable || !pList || !pDoctorFullName) return false;
+  Info.pCollection = pTable;
+  printf("\nPatients:\n");
   return IterateAppointments(pList, OutputDoctorAppointmentsCallback, &Info);
 }

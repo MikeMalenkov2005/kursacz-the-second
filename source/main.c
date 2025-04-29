@@ -55,6 +55,7 @@ int main(void)
         printf("  - remove appointment\n");
         printf("  - list appointments\n");
         printf("  - sort appointments\n");
+        printf("  - clear data\n");
         printf("  - save\n");
         printf("  - load\n");
       }
@@ -76,7 +77,6 @@ int main(void)
           if (GetPatient(pTable, Patient.szRegNumber, false, &Patient))
           {
             OutputPatientData(&Patient);
-            printf("\nAppointments:\n");
             OutputPatientAppointments(pList, Patient.szRegNumber);
           }
           else printf("Error: record not found!\n");
@@ -124,8 +124,7 @@ int main(void)
           if (GetDoctor(pTree, Doctor.szFullName, false, &Doctor))
           {
             OutputDoctorData(&Doctor);
-            printf("\nAppointments:\n");
-            OutputDoctorAppointments(pList, Doctor.szFullName);
+            OutputDoctorAppointments(pTable, pList, Doctor.szFullName);
           }
           else printf("Error: record not found!\n");
         }
@@ -190,6 +189,12 @@ int main(void)
       {
         SortAppointments(pList, AppointmentByDoctorComparator);
         OutputAppointmentList(pList);
+      }
+      else if (!strcmp(cmd, "clear data"))
+      {
+        ClearPatientTable(pTable);
+        ClearDoctorTree(pTree);
+        ClearAppointmentList(pList);
       }
       else if (!strcmp(cmd, "save"))
       {

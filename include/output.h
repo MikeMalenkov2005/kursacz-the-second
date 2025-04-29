@@ -19,6 +19,6 @@ bool OutputAppointmentList(APPOINTMENT_LIST *pList);
 
 bool OutputPatientAppointments(APPOINTMENT_LIST *pList, const char *pPatientRegNumber);
 
-bool OutputDoctorAppointments(APPOINTMENT_LIST *pList, const char *pDoctorFullName);
+bool OutputDoctorAppointments(PATIENT_TABLE *pTable, APPOINTMENT_LIST *pList, const char *pDoctorFullName);
 
 #endif
