@@ -141,7 +141,7 @@ int main(void)
       else if (!strcmp(cmd, "remove doctor"))
       {
         DOCTOR Doctor;
-        if (InputValidString("registration number", NULL, sizeof(Doctor.szFullName), Doctor.szFullName))
+        if (InputValidString("doctor's full name", NULL, sizeof(Doctor.szFullName), Doctor.szFullName))
         {
           if (GetDoctor(pTree, Doctor.szFullName, true, &Doctor))
           {
