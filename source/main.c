@@ -162,7 +162,7 @@ int main(void)
             if (AddAppointment(pList, &Appointment)) printf("Success!\n");
             else printf("Error: the list is full!\n");
           }
-          else printf("Error: this appointment can not be made at specified time!\n");
+          else printf("Error: this appointment can not be made!\n");
         }
       }
       else if (!strcmp(cmd, "get appointment"))
