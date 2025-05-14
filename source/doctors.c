@@ -175,7 +175,7 @@ DOCTOR_NODE *RemoveLeftMostNode(DOCTOR_NODE *pRoot)
 DOCTOR_NODE *FindDoctor(DOCTOR_NODE *pRoot, const char *pFullName, bool bRemove, DOCTOR *pDoctor, bool *pbFound)
 {
   if (!pRoot) return pRoot;
-  int nDifference = strncmp(pFullName, pFullName, sizeof(pRoot->Doctor.szFullName));
+  int nDifference = strncmp(pFullName, pRoot->Doctor.szFullName, sizeof(pRoot->Doctor.szFullName));
   if (nDifference < 0)
   {
     pRoot->pLeft = FindDoctor(pRoot->pLeft, pFullName, bRemove, pDoctor, pbFound);
@@ -204,7 +204,7 @@ DOCTOR_NODE *FindDoctor(DOCTOR_NODE *pRoot, const char *pFullName, bool bRemove,
 
 bool GetDoctor(DOCTOR_TREE *pTree, const char *pFullName, bool bRemove, DOCTOR *pDoctor)
 {
-  if (!pTree || !pDoctor) return false;
+  if (!pTree) return false;
   bool bFound = false;
   pTree->pRoot = FindDoctor(pTree->pRoot, pFullName, bRemove, pDoctor, &bFound);
   return bFound;
