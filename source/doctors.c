@@ -150,7 +150,7 @@ void ClearDoctorTree(DOCTOR_TREE *pTree)
 
 bool GetDoctorCountCallback(const DOCTOR *pDoctor, void *pParams)
 {
-  return !++*(unsigned*)pParams;
+  return ++*(unsigned*)pParams;
 }
 
 unsigned GetDoctorCount(DOCTOR_TREE *pTree)
