@@ -180,7 +180,7 @@ int main(void)
         unsigned nIndex;
         if (InputValidUnsignedInteger("one based index", IsOneBasedIndexValid, &nIndex))
         {
-          if (GetAppointment(pList, nIndex, true, NULL)) printf("Success!\n");
+          if (GetAppointment(pList, nIndex - 1, true, NULL)) printf("Success!\n");
           else printf("Error: index out of bounds!\n");
         }
       }

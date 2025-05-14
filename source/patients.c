@@ -140,7 +140,11 @@ bool GetPatient(PATIENT_TABLE *pTable, const char *pRegNumber, bool bRemove, PAT
   PATIENT_RECORD *pRecord = FindPatientRecord(pTable, nBigHash);
   if (!pRecord) return false;
   if (pPatient) *pPatient = pRecord->Patient;
-  if (bRemove) pRecord->nBigHash = INVALID_HASH;
+  if (bRemove)
+  {
+    pRecord->nBigHash = INVALID_HASH;
+    pTable->nLoad--;
+  }
   return true;
 }
 
