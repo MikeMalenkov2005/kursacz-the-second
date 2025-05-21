@@ -125,6 +125,7 @@ void ClearPatientTable(PATIENT_TABLE *pTable)
     {
       pTable->pRectords[i].bEmpty = true;
     }
+    pTable->nLoad = 0;
   }
 }
 
